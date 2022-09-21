@@ -1,4 +1,4 @@
-# ros_tutorials
+# ROS2 Humble tutorials
 This is a simple package to get started with ROS2 Humble.
 
 ## Create a ROS2 package
@@ -73,7 +73,7 @@ creating ./my_turtlesim/test/test_pep257.py
 When you now list the content of the package directory with:
 
 ```sh
-my_turtlesim  package.xml  resource  setup.cfg  setup.py  test
+ls my_turtlesim
 ```
 
 You will find the following content:
@@ -134,3 +134,105 @@ The file `package.xml` contains meta data about the package such as the required
   </export>
 </package>
 ```
+
+## Create a ROS2 Python file
+
+As mentionned before, the Python scripts will be placed inside the `my_turtlesim/my_turtlesim` folder. You can create a new file with the command:
+
+```sh
+cd my_turltesim/my_turtlesim/
+gedit my_first_program.py
+```
+
+A text editor will open with a blank document. This document will be your first Python ROS2 script. Add the following code to the document and save it:
+
+```python
+import rclpy
+from rclpy.node import Node
+
+
+class MyFirstProgram(Node):
+
+    def __init__(self):
+        super().__init__('my_first_program')
+        self.get_logger().info('Hello, World')
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    my_first_program = MyFirstProgram()
+
+    my_first_program.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+Now, you can close the program and in the terminal, use the following command to make this Python script exectuable:
+
+```sh
+chmod +x my_firstprogram.py
+```
+Next, you need to tell ROS to actually use this new script as part of this package. This is done by adding a line in the `setup.py` file. Open that file by navigating to it:
+
+```sh
+cd ~/ros2_ws/src/my_turtlesim
+gedit config.py
+```
+
+At the bottom of this document, you can see the following part:
+
+```python
+    entry_points={
+        'console_scripts': [
+        ],
+```
+
+You need to add one line so that it looks as follows:
+
+```python
+    entry_points={
+        'console_scripts': [
+            'my_first_node = my_turtlesim.my_first_program:main',
+        ],
+```
+When you build the package later, this line will make sure that the Python script will be seen as a valid ROS node with the name `my_first_node` which can be found inside the `my_turtlesim` package and the source code is saved in the file `my_first_program.py`.
+
+After that, go to the main directory of the `ros2_ws` and compile build your package:
+
+```sh
+cd ~/ros2_ws/
+colcon build
+```
+The terminal should give you the following output:
+
+```
+Starting >>> my_turtlesim
+Finished <<< my_turtlesim [1.06s]          
+
+Summary: 1 package finished [1.28s]
+```
+
+Next, you need to source this workspace so that ROS2 will take into account all the packages in this workspace:
+
+```sh
+source install/local_setp.bash
+```
+Now, everything is ready to run your new program. For this, use the following command:
+
+```sh
+ros2 run my_turtlesim my_first_node
+```
+
+The terminal should output the following text:
+
+```sh
+[INFO] [1663744547.799484529] [my_first_program]: Hello, World!
+```
+
+This is it, you just grated your first Python program in ROS2! Congratulations! Of course, this program is not doing anything useful yet. But ths is the absolute minimum you need to run a proper ROS2 Python program.
+
+In the next section, you will learn more about the ROS eco system.

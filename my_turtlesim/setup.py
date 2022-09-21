@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'my_first_node = my_turtlesim.my_first_program:main',
         ],
     },
 )

@@ -430,3 +430,33 @@ Here, the line `[my_first_node-1] [INFO] [1664266555.799257203] [my_first_progra
 That's it for now. Of course, launch files have much more possibilities such as adding arguments and parameters or even remapping some names. In order to work with these more advanced tools, you need to get a wider foundation about how ROS works.
 
 In the next section, you will learn more about the ROS eco system.
+
+## ROS2 message types
+
+### Topics
+
+Topics are the most basic form of communication in the ROS2 eco system.The allow the robot to send data from one ROS2 node to another node, and even across multiple machines. The idea behind topics is that a node can **publish** data into a topics and every node that wantd to listen to that data can subscribe to this topic and receive the data. Many nodes can listen to a single topic and even multiple nodes can publish into the same topic. A very important topic is the `cmd_vel` topic which stands for **command velocity**. This is the velocity you want the robot to move with towards a goal. This can be published by a node, controlled by a human, or directly from the robot itself in from an autonomnous navigation node. Topics are made for continuous data streams, similat to broadcast TV.
+
+### Services
+
+Services are slightly different than topics. First, they are not made for continuous data streams. They are usually used to trigger a specific behavour of the robot, like taking a picture, resetting a setting or start a certain movement. Services require a two-way communication potocol, similar to TCP/IP where a client has a request to a server, the server than acknowledges that request and send the result back to the client. In the robot, there is a service **server** that waits to receive a request and a service **client** that sends a request. For example, this request could be a command to take a picture with a camera. The server will then take the picture, and either send it to the client, or store it on the hard drive, depending on how the server has been programmed. The client will receive a message that the picture has been taken and the client program can continue its tasks. During the waiting process, the client is not able to do anythong else except waiting for the server. For tis reaon, services are not recommended to tasks that take a ong amount of time.
+
+### Actions
+
+Actions share similarities with topics and services. They are triggered in the same way as a service, having an action **client** aking a request to the action **server** and then waiting for the result. But in the mean time, the client is able to continue with its job while getting a constant stream of **feedback** messages from the serverm similar to a topic that is being published.
+
+
+## Create a ROS2 Python publisher
+
+To create a simple publisher in ROS2 using Python, you need to create a basic Python script, similar as you have done before. Go to the `my_turtlesim` directory and create a new script called `my_simple_publisher.py`:
+
+```sh
+cd ~/ros2_ws/src/my_turtlesim/my_turtlesim/
+gedit my_simple_publisher.py
+```
+
+In this script, copy the following code:
+
+```python
+
+```

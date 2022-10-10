@@ -460,3 +460,6 @@ In this script, copy the following code:
 ```python
 
 ```
+
+The following code can be used to create a simple publisher node:
+

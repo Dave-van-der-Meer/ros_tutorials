@@ -427,7 +427,7 @@ ros2 launch my_turtlesim simple_launch.launch.py
 ```
 Here, the line `[my_first_node-1] [INFO] [1664266555.799257203] [my_first_program]: Hello, World!` is the actual output of the node that you started, and the other lines just tell you that the launc file has started and finished successfully.
 
-That's it for now. Of course, launch files have much more possibilities such as adding arguments and parameters or even remapping some names. In order to work with these more advanced tools, you need to get a wider foundation about how ROS works.
+That is it for now. Of course, launch files have much more possibilities such as adding arguments and parameters or even remapping some names. In order to work with these more advanced tools, you need to get a wider foundation about how ROS works.
 
 In the next section, you will learn more about the ROS eco system.
 
@@ -458,5 +458,21 @@ gedit my_simple_publisher.py
 In this script, copy the following code:
 
 ```python
+Simplest form of a publisher without class inheritance
 
+from time import sleep
+import rclpy
+from std_msgs.msg import String
+
+rclpy.init()
+node = rclpy.create_node('my_publisher')
+pub = node.create_publisher(String, 'chatter', 10)
+msg = String()
+i = 0
+while rclpy.ok():
+    msg.data = f'Hello World: {i}'
+    i += 1
+    print(f'Publishing: "{msg.data}"')
+    pub.publish(msg)
+    sleep(0.5)
 ```

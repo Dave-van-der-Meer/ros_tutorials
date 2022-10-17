@@ -591,3 +591,26 @@ Add the following line inside the `entry_points`:
 ```python
 'my_simple_subscriber = my_turtlesim.my_simple_subscriber:main',
 ```
+This will allow to execute the subscriber script after building the package. To build the package, head to the root directory of your workspace and use `colcon build`:
+
+```sh
+cd ~/ros2_ws/
+colcon build --symlink-install
+source install/setup.bash
+```
+
+This should build the package and source the workspace. You can now open the `turtlesim` program with:
+
+```sh
+ros2 run turtlesim turtlesim_node
+```
+
+And your subscriber node with:
+
+```sh
+ros2 run my_turtlesim my_siple_subscriber
+```
+
+You node should now print the x and y coordinates of the simulated turtle.
+
+## Create a simple Python Service Server

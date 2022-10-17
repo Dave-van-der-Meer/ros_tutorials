@@ -523,3 +523,71 @@ while rclpy.ok():
 ```
 
 
+## Create a ROS2 Python subscriber
+
+A subscriber is listening to a topic. It requires the topic name, the message type and a callback function that is being activated every time a new message from that topic is received.
+
+Create a new file called `my_simple_subscriber.py` and make it executable:
+
+```sh
+cd ~/ros2_ws/src/my_turtlesim/my_turtlesim/
+touch my_simple_subscriber.py
+chmod +x my_simple_subscriber.py
+```
+
+Open this file and copy the following code:
+
+```python
+import rclpy
+from rclpy.node import Node
+
+from std_msgs.msg import String
+from turtlesim.msg import Pose
+
+
+class MySimpleSubscriber(Node):
+
+    def __init__(self):
+        super().__init__('minimal_subscriber')
+        self.my_subscriber = self.create_subscription(
+            Pose,
+            'turtle1/pose',
+            self.listener_callback,
+            10)
+        # prevent warning that se.fmy_subscriber is not used
+        self.my_subscriber
+
+    def listener_callback(self, msg):
+        self.get_logger().info(f'Turtle found at x: {msg.x}; y: {msg.y}')
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    my_simple_subscriber = MySimpleSubscriber()
+    rclpy.spin(my_simple_subscriber)
+
+     # destroy the node when it is not used anymore
+    my_simple_subscriber.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+As with the publisher before, we create a main function that is initialising the ROS2 environment, then create a class instance of our subscriber node and keep it running with the `rclpy.spin()` function. The class `MySimpleSubscriber` is inherited from the `Node` class to create our subscriber node.
+
+During the initialisation of this class instance, we create a subscriber and define the message type, the topic name and the que size which defines how the node will handle messages when they are received faster than they are processed. At the beginning, a que size of 10 is usually a good start.
+
+Save the file and open the file called `setup.py` in the root directory of the package:
+
+```sh
+cd ../
+gedit setup.py
+```
+
+Add the following line inside the `entry_points`:
+
+```python
+'my_simple_subscriber = my_turtlesim.my_simple_subscriber:main',
+```

@@ -614,3 +614,83 @@ ros2 run my_turtlesim my_siple_subscriber
 You node should now print the x and y coordinates of the simulated turtle.
 
 ## Create a simple Python Service Server
+
+A service is a message type in ROS that allows to send a request from a client to a server. The server will handle the request and send back a response. The first thing you will need is the server that can accept the request.
+
+Create a new file called `my_service_server.py` and make it executable:
+
+```sh
+cd ~/ros2_ws/src/my_turtlesim/my_turtlesim/
+touch my_service_server.py
+chmod +x my_service_server.py
+```
+
+Open this file and copy the following code:
+
+```python
+import rclpy
+from rclpy.node import Node
+from std_srvs.srv import Trigger
+from geometry_msgs.msg import Twist
+
+
+class MyServiceServer(Node):
+
+    def __init__(self):
+        super().__init__('my_service_server')
+        self.my_service = self.create_service(Trigger, 'draw_circle', self.draw_circle_callback)
+        self.publisher_ = self.create_publisher(Twist, 'turtle1/cmd_vel', 10)
+
+    def draw_circle_callback(self, request, response):
+        request # request must be specified even if it is not used
+        self.get_logger().info('Received request to draw a circle!')
+        response.success = True
+        response.message = "Starting to draw a circle!"
+        timer_period = 0.5  # seconds
+        self.timer = self.create_timer(timer_period, self.publish_velocity_callback)
+        self.i = 0
+
+        return response
+
+    def publish_velocity_callback(self):
+        my_velocity = Twist()
+        my_velocity.linear.x = 0.5
+        my_velocity.angular.z = 0.5
+        self.publisher_.publish(my_velocity)
+        self.get_logger().info(f"Publishing velocity: \n\t linear.x: {my_velocity.linear.x}; \n\t linear.z: {my_velocity.linear.x}")
+        self.i += 1
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    my_service_server = MyServiceServer()
+
+    rclpy.spin(my_service_server)
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+Save the file and open the file called `setup.py` in the root directory of the package:
+
+```sh
+cd ../
+gedit setup.py
+```
+
+Add the following line inside the `entry_points`:
+
+```python
+'my_service_server = my_turtlesim.my_service_server:main',
+```
+This will allow to execute the subscriber script after building the package. To build the package, head to the root directory of your workspace and use `colcon build`:
+
+```sh
+cd ~/ros2_ws/
+colcon build --symlink-install
+source install/setup.bash
+```
+
+This should build the package and source the workspace. You can now open the `turtlesim` program with:

@@ -27,7 +27,9 @@ class MyServiceServer(Node):
         my_velocity.linear.x = 0.5
         my_velocity.angular.z = 0.5
         self.publisher_.publish(my_velocity)
-        self.get_logger().info(f"Publishing velocity: \n\t linear.x: {my_velocity.linear.x}; \n\t linear.z: {my_velocity.linear.x}")
+        self.get_logger().info(f"Publishing velocity: \
+            \n\t linear.x: {my_velocity.linear.x}; \
+            \n\t linear.z: {my_velocity.linear.x}")
         self.i += 1
 
 

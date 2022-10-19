@@ -608,7 +608,7 @@ ros2 run turtlesim turtlesim_node
 And your subscriber node with:
 
 ```sh
-ros2 run my_turtlesim my_siple_subscriber
+ros2 run my_turtlesim my_simple_subscriber
 ```
 
 You node should now print the x and y coordinates of the simulated turtle.
@@ -657,7 +657,9 @@ class MyServiceServer(Node):
         my_velocity.linear.x = 0.5
         my_velocity.angular.z = 0.5
         self.publisher_.publish(my_velocity)
-        self.get_logger().info(f"Publishing velocity: \n\t linear.x: {my_velocity.linear.x}; \n\t linear.z: {my_velocity.linear.x}")
+        self.get_logger().info(f"Publishing velocity: \
+            \n\t linear.x: {my_velocity.linear.x}; \
+            \n\t linear.z: {my_velocity.linear.x}")
         self.i += 1
 
 
@@ -694,3 +696,120 @@ source install/setup.bash
 ```
 
 This should build the package and source the workspace. You can now open the `turtlesim` program with:
+
+```sh
+ros2 run turtlesim turtlesim_node
+```
+
+And your subsservice server node with:
+
+```sh
+ros2 run my_turtlesim my_service_server
+```
+
+The server will wait in the background until it is being called. To call the service, open a new terminal and use the following command:
+
+```sh
+ros2 service call /draw_circle std_srvs/srv/Trigger {}
+```
+
+This command will call the service `/draw_circle` with a message of type `Trigger` which is stored inside the package `std_srvs`. Now, the turtle should start drawing a circle.
+
+## Create a simple Python Service Client
+
+A service server can be called through the command line or through a ROS2 node. Create a new file called `my_service_client.py` inside the `my_turtlesim` package and make it executable:
+
+```sh
+cd ~/ros2_ws/src/my_turtlesim/my_turtlesim/
+touch my_service_client.py
+chmod +x my_service_client.py
+```
+
+Open this file and copy the following code:
+
+```python
+import rclpy
+from rclpy.node import Node
+from std_srvs.srv import Trigger
+
+
+class MyServiceClient(Node):
+
+    def __init__(self):
+        super().__init__('my_service_client')
+        self.my_client = self.create_client(Trigger, 'draw_circle')
+        while not self.my_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Waiting for service to become avilable...')
+        self.req = Trigger.Request()
+
+    def send_request(self):
+        self.future = self.my_client.call_async(self.req)
+        rclpy.spin_until_future_complete(self, self.future)
+        return self.future.result()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    my_service_client = MyServiceClient()
+    response = my_service_client.send_request()
+    my_service_client.get_logger().info(
+        f'Result for triggering "Draw Circle: \
+        \n\tSuccessful: {response.success} \
+        \n\tMessage: {response.message}')
+
+    my_service_client.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+Next, add the following line inside of the `setup.py` file:
+
+``` python
+'my_service_client = my_turtlesim.my_service_client:main',
+```
+
+Now, the `entry_points` section in the `setup.py` file should look as follows:
+
+```python
+    entry_points={
+        'console_scripts': [
+            'my_first_node = my_turtlesim.my_first_program:main',
+            'my_simple_publisher = my_turtlesim.my_simple_publisher:main',
+            'my_simple_subscriber = my_turtlesim.my_simple_subscriber:main',
+            'my_service_server = my_turtlesim.my_service_server:main',
+            'my_service_client = my_turtlesim.my_service_client:main',
+        ],
+    },
+```
+
+Now, build the package and source the workspace:
+
+```sh
+cd ~/ros2_ws/
+colcon build --symlink-install
+source install/setup.bash
+```
+
+You need to start the `turtlesim` node with:
+
+```sh
+ros2 run turtlesim turtlesim_node
+```
+
+Then, start the service server from previously in a new terminal:
+
+```sh
+ros2 run my_turtlesim my_service_server
+```
+
+At last, you can run the service client. If you run the client first, it will wait for the service to become available, so in this case, the order will not matter too much.
+
+```sh
+ros2 run my_turtlesim my_service_client
+```
+
+As soon as you start the client, it will send a request to the server wich will make the turtle draw circles. A common use case for this would be to take off or land with a drone, or save a picture of a camera.  More use cases would be to open and close a gripper, to send some data or any kind of action that will take a short amount of time and that does happen on a few occasions rather than all the time.

@@ -27,6 +27,7 @@ setup(
             'my_simple_publisher = my_turtlesim.my_simple_publisher:main',
             'my_simple_subscriber = my_turtlesim.my_simple_subscriber:main',
             'my_service_server = my_turtlesim.my_service_server:main',
+            'my_service_client = my_turtlesim.my_service_client:main',
         ],
     },
 )

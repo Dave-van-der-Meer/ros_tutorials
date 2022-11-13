@@ -180,7 +180,7 @@ Next, you need to tell ROS to actually use this new script as part of this packa
 
 ```sh
 cd ~/ros2_ws/src/my_turtlesim
-gedit config.py
+gedit setup.py
 ```
 
 At the bottom of this document, you can see the following part:
